@@ -1,0 +1,58 @@
+<table  class="table card-table table-responsive table-responsive-large myTable hover" style="width:100%">
+                                  <thead>
+                                  <tr>
+                                      <th>Nom</th>
+                                      <th>Prénom</th>
+                                      <th>Email</th>
+                                      <th>Role</th>
+                                      <th>Statut</th>
+                                      <th>Dernier connexion</th>
+                                      <th>Date de création</th>
+                                      <th><p id="redone">Action</p></th>
+                                  </tr>
+                                  </thead>
+                                  <tbody>
+                                  <tr v-for="client in clients.content">
+                                      <th>{{ client.id }}</th>
+                                      <td>{{ client.nom }}</td>
+                                      <td>{{ client.prenom }}</td>
+                                      <td>{{ client.compte.email }}</td>
+                                      <td>{{ client.compte.user_role.nom }}</td>
+                                      <td>
+                                          <button v-if="client.compte.is_active == null " class="btn btn-success" @click="goToActive(client)"> Activer</button>
+                                          <button v-else class="btn btn-danger" @click="goToActive(client)">Désactiver</button>
+                                      </td>
+
+                                      <td>{{ client.compte.last_login}}</td>
+                                      <td>{{ client.compte.created_at}}</td>
+                                      <td class="text-right">
+                                          <div class="dropdown show d-inline-block widget-dropdown">
+                                              <a class="dropdown-toggle icon-burger-mini" href="" role="button" id="dropdown-recent-order1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static"></a>
+                                              <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown-recent-order1">
+                                                  <li class="dropdown-item">
+                                                      <button class="mb-1 btn btn-pill btn-info" @click="show(client)">
+                                                          <i class="mdi mdi-eye"></i>
+                                                      </button>
+                                                  </li>
+                                                  <li class="dropdown-item">
+                                                      <button class="mb-1 btn btn-pill btn-warning" >
+                                                          <i class="mdi mdi-pencil"></i>
+                                                      </button>
+                                                  </li>
+                                                  <li class="dropdown-item">
+                                                      <button  class="mb-1 btn btn-pill btn-danger" @click="deleteModal(client)">
+                                                          <i class="mdi mdi-delete-forever"></i>
+                                                      </button>
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </td>
+                                  </tr>
+
+                                  </tbody>
+                              </table>
+                                  
+
+                        
+                             
+                          
