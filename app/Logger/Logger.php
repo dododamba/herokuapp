@@ -36,12 +36,12 @@ const  DELETE_FAILURE_ACTION = 'Suppression érroné item = ';
 
 class Logger
 {
-    private $action;
-    private $adresseIp;
-    private $location;
-    private $user;
-    private $table;
-    private $logger_token;
+    private static $action;
+    private static $adresseIp;
+    private static $location;
+    private static $user;
+    private static $table;
+    private static $logger_token;
 
 
     /**
@@ -53,130 +53,129 @@ class Logger
      * @param $table
      * @param $logger_token
      */
-    public function __construct($action, $adresseIp, $location, $user, $table, $logger_token)
+    public  function __construct($action, $adresseIp, $location, $user, $table, $logger_token)
     {
-        $this->action = $action;
-        $this->adresseIp = $adresseIp;
-        $this->location = $location;
-        $this->user = $user;
-        $this->table = $table;
-        $this->logger_token = $logger_token;
+       self::$action = $action;
+       self::$adresseIp = $adresseIp;
+       self::$location = $location;
+       self::$user = $user;
+       self::$table = $table;
+       self::$logger_token = $logger_token;
     }
 
     /**
      * @return mixed
      */
-    public function getAction()
+    public static function getAction()
     {
-        return $this->action;
+        return self::$action;
     }
 
     /**
      * @param mixed $action
      */
-    public function setAction($action): void
+    public static function setAction($action): void
     {
-        $this->action = $action;
     }
 
     /**
      * @return mixed
      */
-    public function getAdresseIp()
+    public static function getAdresseIp()
     {
-        return $this->adresseIp;
+        return self::$adresseIp;
     }
 
     /**
      * @param mixed $adresseIp
      */
 
-    public function setAdresseIp(): void
+    public static function setAdresseIp(): void
     {
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $this->adresseIp = $_SERVER['HTTP_CLIENT_IP'];
+           self::$adresseIp = $_SERVER['HTTP_CLIENT_IP'];
         } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $this->adresseIp = $_SERVER['HTTP_X_FORWARDED_FOR'];
+           self::$adresseIp = $_SERVER['HTTP_X_FORWARDED_FOR'];
         } else {
-            $this->adresseIp = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
+           self::$adresseIp = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
         }
     }
 
     /**
      * @return mixed
      */
-    public function getLocation()
+    public static function getLocation()
     {
-        return $this->location;
+        return self::$location;
     }
 
     /**
      * @param mixed $location
      */
-    public function setLocation($location): void
+    public static function setLocation(): void
     {
-        $this->location = 'Gabon';
+       self::$location = 'Gabon';
     }
 
     /**
      * @return mixed
      */
-    public function getUser()
+    public static function getUser()
     {
-        return $this->user;
+        return self::user;
     }
 
     /**
      * @param mixed $user
      */
-    public function setUser(): void
+    public static function setUser(): void
     {
 
         if (Sentinel::guard('web')->check()) {
-            $this->user = Sentinel::getUser();
+           self::$user = Sentinel::getUser();
         }
-        $this->user = 'Visiteur';
+       self::$user = 'Visiteur';
     }
 
     /**
      * @return mixed
      */
-    public function getTable()
+    public static function getTable()
     {
-        return $this->table;
+        return self::$table;
     }
 
     /**
      * @param mixed $table
      */
-    public function setTable($table): void
+    public static function setTable(): void
     {
-        $this->table = $table;
+       self::$table = '';
     }
 
     /**
      * @return mixed
      */
-    public function getLoggerToken()
+    public static function getLoggerToken()
     {
-        return $this->logger_token;
+        return self::$logger_token;
     }
 
     /**
      * @param mixed $logger_token
      */
-    public function setLoggerToken(): void
+    public static function setLoggerToken(): void
     {
-        $this->logger_token = $this->str_randomize(70);
+       self::$logger_token =self::str_randomize(70);
     }
 
-    function tableName($model)
+    static function tableName($model)
     {
 
         return (new $model())->getTable();
     }
 
-    protected function str_randomize($length)
+    protected static function str_randomize($length)
     {
 
         $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -188,227 +187,227 @@ class Logger
         return $randomString;
     }
 
-    public function fetchLog($model)
+    public static function fetchLog($model)
     {
         Log::create(
             [
                 'action' => FETCH_ACTION,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function fetchEmptyLog($model)
+    public static function fetchEmptyLog($model)
     {
         Log::create(
             [
                 'action' => FETCH_EMPTY,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function notFoundLog($model, $id)
+    public static function notFoundLog($model, $id)
     {
         Log::create(
             [
                 'action' => NOT_FOUND . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function createLog($model)
+    public static function createLog($model)
     {
         Log::create(
             [
                 'action' => STORE_ACTION,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function createFailureLog($model)
+    public static function createFailureLog($model)
     {
         Log::create(
             [
                 'action' => STORE_FAILURE_ACTION,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function showLog($model, $id)
+    public static function showLog($model, $id)
     {
         Log::create(
             [
                 'action' => SHOW_ACTION . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function showFailureLog($model, $id)
+    public static function showFailureLog($model, $id)
     {
         Log::create(
             [
                 'action' => SHOW_FAILURE_ACTION . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
 
     }
 
 
-    public function editLog($model, $id)
+    public static function editLog($model, $id)
     {
         Log::create(
             [
                 'action' => EDIT_ACTION . ' ' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function editFailureLog($model, $id)
+    public static function editFailureLog($model, $id)
     {
         Log::create(
             [
                 'action' => EDIT_FAILURE_ACTION . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function updateLog($model, $id)
+    public static function updateLog($model, $id)
     {
         Log::create(
             [
                 'action' => UPDATE_ACTION . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function updateFailureLog($model, $id)
+    public static function updateFailureLog($model, $id)
     {
         Log::create(
             [
                 'action' => UPDATE_FAILURE_ACTION . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function storeLog($model)
+    public static function storeLog($model)
     {
         Log::create(
             [
                 'action' => STORE_ACTION,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function storeFailureLog($model)
+    public static function storeFailureLog($model)
     {
         Log::create(
             [
                 'action' => STORE_FAILURE_ACTION,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function deleteLog($model, $id)
+    public static function deleteLog($model, $id)
     {
         Log::create(
             [
                 'action' => DELETE_ACTION . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }
 
 
-    public function deleteFailureLog($model, $id)
+    public static function deleteFailureLog($model, $id)
     {
         Log::create(
             [
                 'action' => DELETE_FAILURE_ACTION . '' . $id,
-                'adresseIp' => $this->getAdresseIp(),
-                'location' => $this->getLocation(),
-                'user' => $this->getUser(),
-                'table' => $this->tableName($model),
-                'logger_token' => $this->getLoggerToken(),
+                'adresseIp' =>self::getAdresseIp(),
+                'location' =>self::getLocation(),
+                'user' =>self::getUser(),
+                'table' =>self::tableName($model),
+                'logger_token' =>self::getLoggerToken(),
             ]
         );
     }

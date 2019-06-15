@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 
 use Sentinel;
 use Activation;
-
+use App\Logger\Logger as Logger;
 /*
 |--------------------------------------------------------------------------
 |
@@ -47,7 +47,7 @@ class PersonnelController extends Controller
             ->where('name', '<>', 'admin')
             ->get();
         if (!PersonnelResource::collection($personnels)->isEmpty()) {
-            fetchLog(Personnel::class);
+            Logger::fetchLog(Personnel::class);
             return response()->json(
                 [
                     'content' => [
@@ -59,7 +59,7 @@ class PersonnelController extends Controller
                 ['Content-Type' => 'application/json']
             );
         }
-        fetchEmptyLog(Personnel::class);
+        Logger::fetchEmptyLog(Personnel::class);
         return response()->json(['content' => [
             'message' => 'Liste vide',
             'roles' => $roles,
@@ -167,55 +167,25 @@ class PersonnelController extends Controller
             ];
 
             Personnel::create($data_);
-
+            Logger::createLog(Personnel::class);
+            Logger::createLog(User::class);
             if ($user) {
                 $user->roles()->sync([$role_]);
                 return response()->json(['message' => 'Personnel ajouté avec succès', 'status' => $assert_true]);
             }
+            Logger::createFailureLog(Personnel::class);
+            Logger::createFailureLog(User::class);
             return response()->json(
                 [
                     'error' => 'La création du compte personnel n\'est pas terminé, vueillé recommencer !',
                     'status' => $assert_false
                 ]);
         }
+        Logger::createFailureLog(Personnel::class);
+        Logger::createFailureLog(User::class);
         return response()->json(['error' => 'erreur creation personnel, recommencez svp !', 'status' => $assert_false]);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param string $slug
-     *
-     * @return Response
-     */
-    public function update(Request $request, $slug)
-    {
-        if (Personnel::where('slug', '=', $slug)->first()) {
-            $personnel = Personnel::where('slug', '=', $slug)->first();
-            if ($personnel->update($data)) {
-                $personnel = Personnel::where('slug', '=', $slug)->first();
-                $data = [
-                    // 'nom' =>$request->,
-                    'prenom' => $request->prenom,
-                    'date_embauche' => $request->date_embauche,
-                    'etat' => $request->etat,
-                    'date_naissance' => $request->date_naissance,
-                    'matricule' => $request->matricule,
-                    'slug' => str_slug(name_generator('personnel', 10), '-')
-                ];
-                updateLog(Personnel::class, $personnel->id);
-                return response()->json(['message' => ' Personnel mise à jours avec succès !'], 200, ['Content-Type' => 'application/json']);
-            } else {
-                updateFailureLog(Personnel::class, $personnel->id);
-                return response()->json(['message' => ' echec mise à jours Personnel  !'], 400, ['Content-Type' => 'application/json']);
-            }
-
-        }
-
-        notFoundLog(Personnel::class, setZero());
-        return response()->json(['message' => ' Personnel n\'existe pas !'], 404, ['Content-Type' => 'application/json']);
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -231,6 +201,7 @@ class PersonnelController extends Controller
             $role = Role::where('id', '=', $user->role)->first();
             $personel_slug = $user->getAffiliatePersonnel->slug;
             $personel = Personnel::where('slug', $personel_slug)->first();
+            Logger::deleteLog(Personnel::class,$personel->id);
             if ($user->delete() && $personel->delete()) {
                 return response()->json(['message' => ' !!! Ce utilisateur a ete suprrimé avec succès !!!'], 200, ['Content-Type' => 'application/json']);
             }
@@ -239,7 +210,7 @@ class PersonnelController extends Controller
 
         }
 
-        deleteFailureLog(Personnel::class, setZero());
+        Logger::deleteFailureLog(Personnel::class, setZero());
         return response()->json(['message' => ' !!! Client n\'existe pas !!!'], 404, ['Content-Type' => 'application/json']);
     }
 

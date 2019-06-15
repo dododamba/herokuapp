@@ -1,5 +1,5 @@
 <?php
-$DATABASE_URL = parse_url(getenv("DATABASE_URL"));
+//$DATABASE_URL = parse_url(getenv("DATABASE_URL"));
 return [
     /*
     |--------------------------------------------------------------------------
@@ -12,8 +12,8 @@ return [
     | you may use many connections at once using the Database library.
     |
     */
-     /// 'default' => env('DB_CONNECTION', 'mysql'),
-    'default' => env('DB_CONNECTION', 'pgsql_heroku'),
+    'default' => env('DB_CONNECTION', 'mysql'),
+    //'default' => env('DB_CONNECTION', 'pgsql_heroku'),
     /*
     |--------------------------------------------------------------------------
     | Database Connections
@@ -71,7 +71,7 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
-       'pgsql_heroku' => [
+      /* 'pgsql_heroku' => [
             'driver' => 'pgsql',
             'host' => $DATABASE_URL["host"],
             'port' => $DATABASE_URL["port"],
@@ -82,7 +82,7 @@ return [
             'prefix' => '',
             'schema' => 'public',
             'sslmode' => 'require',
-        ],
+        ],*/
     ],
     /*
     |--------------------------------------------------------------------------

@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 //use App\Http\Resources\Client as ClientResource;
 use App\Client;
 use App\Role;
-
+use App\Logger\Logger as Logger;
 use App\Http\Resources\User as UserResource;
 use App\Http\Resources\Client as ClientResource;
 use Illuminate\Support\Facades\Validator;
@@ -41,7 +41,7 @@ class ClientController extends Controller
         $role = Role::all();
 
         if (!ClientResource::collection($clients)->isEmpty()) {
-            fetchLog(Client::class);
+            Logger::fetchLog(Client::class);
             return response()->json(
 
                 [
@@ -56,7 +56,7 @@ class ClientController extends Controller
                 ]);
 
         }
-        fetchEmptyLog(Client::class);
+        Logger::fetchEmptyLog(Client::class);
         return response()->json(['message' => 'Utilisateur empty']);
 
     }
@@ -160,38 +160,6 @@ class ClientController extends Controller
 
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param string $slug
-     *
-     * @return Response
-     */
-    public function update(Request $request, $slug)
-    {
-        if (Client::where('slug', '=', $slug)->first()) {
-            $client = Client::where('slug', '=', $slug)->first();
-            $data = [
-                'nom' => $request->nom,
-                'prenom' => $request->prenom,
-                'slug' => str_slug(name_generator('client', 10), '-'),
-                'utilisateur' => $request->utilisateur
-            ];
-            if ($client->update($data)) {
-                $client = Client::where('slug', '=', $slug)->first();
-                updateLog(Client::class, $client->id);
-                return response()->json(['message' => ' Client mise à jours avec succès !'], 200, ['Content-Type' => 'application/json']);
-            } else {
-                updateFailureLog(Client::class, $client->id);
-                return response()->json(['message' => ' echec mise à jours Client  !'], 400, ['Content-Type' => 'application/json']);
-            }
-
-        }
-
-        notFoundLog(Client::class, setZero());
-        return response()->json(['message' => ' Client n\'existe pas !'], 404, ['Content-Type' => 'application/json']);
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param string $slug
@@ -214,7 +182,7 @@ class ClientController extends Controller
 
         }
 
-        deleteFailureLog(Client::class, setZero());
+        Logger::deleteFailureLog(Client::class, 0);
         return response()->json(['error' => ' !!! Client n\'existe pas !!!'], 404, ['Content-Type' => 'application/json']);
     }
 
