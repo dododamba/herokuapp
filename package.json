@@ -16,7 +16,7 @@
         "jquery": "^3.1.1",
         "laravel-mix": "0.*",
         "lodash": "^4.17.4",
-        "node-sass": "^4.12.0",
+        "node-sass": "^7.0.0",
         "sweetalert2": "*",
         "vue": "^2.5.7",
         "vue2-datepicker": "^2.11.2",
